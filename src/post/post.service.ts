@@ -1,8 +1,9 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { NotFoundError } from 'rxjs';
 import { Auth } from 'src/entities/auth.entity';
 import { MicroPost } from 'src/entities/microposts.entity';
-import { MoreThan, Repository } from 'typeorm';
+import { Equal, MoreThan, Repository } from 'typeorm';
 
 type ResultType = {
     id: number;
@@ -36,7 +37,7 @@ export class PostService {
             content: message
         }
 
-        await this.microPostsRepository.save(record)
+        return await this.microPostsRepository.save(record)
     }
 
     async getList(token: string, start: number = 0, nr_records: number = 1){
@@ -69,5 +70,32 @@ export class PostService {
         return records     
 
 
+    }
+
+    async deletePost(token: string, id: number) {
+        const now = new Date()
+        const auth = await this.authRepository.findOne({
+            where: {
+                token: Equal(token),
+                expire_at: MoreThan(now)
+            }
+        })
+
+        if(!auth) throw new ForbiddenException();
+
+        const post = await this.microPostsRepository.findOne({
+            where: {
+                id: id
+            }
+        })
+
+        if(!post) throw new NotFoundException();
+
+        const user_id = auth.user_id
+        if(user_id === post.user_id){
+            return await this.microPostsRepository.delete(id)
+        } else {
+            throw new ForbiddenException()
+        }
     }
 }

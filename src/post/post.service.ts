@@ -56,6 +56,7 @@ export class PostService {
         .leftJoinAndSelect("user", "user", "user.id = micro_post.user_id" )
         .select([
             "micro_post.id as id",
+            "micro_post.user_id as user_id",
             "user.name as name",
             "micro_post.content as content",
             "micro_post.created_at as created_at"

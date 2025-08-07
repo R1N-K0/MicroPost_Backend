@@ -8,6 +8,6 @@ async function bootstrap() {
     origin: "*",
     allowedHeaders: 'Origin, X-Requested-With, Content-Type, Accept'
   })
-  await app.listen(process.env.PORT ?? 3000);
+  await app.listen(port, "0.0.0.0");
 }
 bootstrap();

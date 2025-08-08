@@ -14,7 +14,7 @@ export class PostController {
         @Query("q") search: string
     ){
         if(search){
-            return await this.postService.searchPost(token, search, records)
+            return await this.postService.searchPost(token, start, records, search)
         } else {
             return await this.postService.getList(token, start, records);
         }   

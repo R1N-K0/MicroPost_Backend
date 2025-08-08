@@ -71,7 +71,7 @@ export class PostService {
         return records     
     }
 
-    async searchPost(token: string, search: string, nr_records: number = 1){
+    async searchPost(token: string, start: number = 0, nr_records: number = 1, search: string){
         const now = new Date()
         const auth = this.authRepository.find({
             where: {
@@ -96,11 +96,11 @@ export class PostService {
                 "micro_post.content like :search", {search: `%${search}%`}
             )
             .orderBy("micro_post.created_at", "DESC")
-            .offset(0)
+            .offset(start)
             .limit(nr_records);
         
         const records = await qb.getRawMany<ResultType>();
-        
+
         console.log(records)
         return records     
 

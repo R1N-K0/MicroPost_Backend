@@ -4,6 +4,7 @@ import { Equal, Repository } from 'typeorm';
 import { User } from 'src/entities/user.entity';
 import { Auth } from 'src/entities/auth.entity';
 import * as crypto from "crypto"
+import { AuthUserDto } from 'src/Dto/auth-user-dto';
 
 @Injectable()
 export class AuthService {
@@ -16,8 +17,8 @@ export class AuthService {
     ){
     }
 
-    async getAuth(name: string, password:string) {
-   
+    async getAuth(authUserDto: AuthUserDto) {
+        const {name, password} = authUserDto
         if(!password) throw new UnauthorizedException();
 
         const hash = crypto.createHash("md5").update(password).digest("hex")

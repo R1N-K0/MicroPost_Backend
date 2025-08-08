@@ -1,9 +1,10 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { Equal, MoreThan, Repository } from 'typeorm';
 import { User } from 'src/entities/user.entity';
 import { Auth } from 'src/entities/auth.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as crypto from "crypto"
+import { CreateUserDto } from 'src/Dto/create-user-dto';
 
 @Injectable()
 export class UserService {
@@ -36,7 +37,16 @@ export class UserService {
         return user
     }
 
-    async createUser(name: string, email: string, password: string) {
+    async createUser(createUserDto: CreateUserDto) {
+        const {name, email, password} = createUserDto
+        const user = await this.userRepository.findOne({
+            where: {
+                email: Equal(email)
+            }
+        })
+
+        if(user) throw new BadRequestException("ユーザーはすでに登録されています");
+        
         const hash = crypto.createHash("md5").update(password).digest("hex")
 
         const record = {
@@ -45,7 +55,6 @@ export class UserService {
             hash: hash
         }
 
-        await this.userRepository.save(record)
-        return "成功しました";
+        return await this.userRepository.save(record)
     }
 }

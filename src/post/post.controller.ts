@@ -11,8 +11,13 @@ export class PostController {
         @Query("token") token: string,
         @Query("start") start: number,
         @Query("records") records: number,
+        @Query("q") search: string
     ){
-        return await this.postService.getList(token, start, records);
+        if(search){
+            return await this.postService.searchPost(token, search, records)
+        } else {
+            return await this.postService.getList(token, start, records);
+        }   
     }
 
     @Post()

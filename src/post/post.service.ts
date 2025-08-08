@@ -69,7 +69,40 @@ export class PostService {
         
         console.log(records)
         return records     
+    }
 
+    async searchPost(token: string, search: string, nr_records: number = 1){
+        const now = new Date()
+        const auth = this.authRepository.find({
+            where: {
+                token: token,
+                expire_at: MoreThan(now)
+            }
+        })
+
+        if(!auth) throw new ForbiddenException();
+
+        const qb = this.microPostsRepository
+            .createQueryBuilder("micro_post")
+            .leftJoinAndSelect("user", "user", "user.id = micro_post.user_id" )
+            .select([
+                "micro_post.id as id",
+                "micro_post.user_id as user_id",
+                "user.name as name",
+                "micro_post.content as content",
+                "micro_post.created_at as created_at"
+            ])
+            .where(
+                "micro_post.content like :search", {search: `%${search}%`}
+            )
+            .orderBy("micro_post.created_at", "DESC")
+            .offset(0)
+            .limit(nr_records);
+        
+        const records = await qb.getRawMany<ResultType>();
+        
+        console.log(records)
+        return records     
 
     }
 

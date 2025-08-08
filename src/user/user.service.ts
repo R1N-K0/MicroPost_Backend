@@ -29,6 +29,11 @@ export class UserService {
         const user = await this.userRepository.findOne({
             where: {
                 id: Equal(id)
+            },
+            select: {
+                id: true,
+                name: true,
+                created_at: true
             }
         })
 

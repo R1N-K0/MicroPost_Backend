@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
+import listEndpoints from 'express-list-endpoints';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -11,5 +12,7 @@ async function bootstrap() {
     allowedHeaders: 'Origin, X-Requested-With, Content-Type, Accept'
   })
   await app.listen(port, "0.0.0.0");
+  const expressApp = app.getHttpAdapter().getInstance();
+  console.log(listEndpoints(expressApp));
 }
 bootstrap();

@@ -1,6 +1,5 @@
 import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { NotFoundError } from 'rxjs';
 import { Auth } from 'src/entities/auth.entity';
 import { MicroPost } from 'src/entities/microposts.entity';
 import { Equal, MoreThan, Repository } from 'typeorm';
@@ -69,6 +68,30 @@ export class PostService {
         
         console.log(records)
         return records     
+    }
+
+    async getUserPost(token: string, id: number){
+        const now = new Date();
+        const auth = await this.authRepository.findOne({
+            where: {
+                token: token,
+                expire_at: MoreThan(now)
+            }
+        })
+
+        if(!auth) throw new ForbiddenException();
+
+        const res = await this.microPostsRepository.find({
+            where: {
+                user_id: Equal(id)
+            },
+
+            order: {
+                created_at: "DESC"
+            }
+        })
+
+        return res
     }
 
     async searchPost(token: string, start: number = 0, nr_records: number = 1, search: string){

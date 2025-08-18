@@ -5,6 +5,7 @@ import { Auth } from 'src/entities/auth.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as crypto from "crypto"
 import { CreateUserDto } from 'src/Dto/create-user-dto';
+import { UpdateUserData } from 'src/types';
 
 @Injectable()
 export class UserService {
@@ -61,5 +62,37 @@ export class UserService {
         }
 
         return await this.userRepository.save(record)
+    }
+
+    async updateUser(token: string, user_id: number, data: UpdateUserData){
+        const now = new Date();
+        const auth = await this.authRepository.findOne({
+            where: {
+                token: Equal(token),
+                expire_at: MoreThan(now)
+            }
+        })
+
+        if(!auth) throw new ForbiddenException();
+    
+        if(auth.user_id !== user_id) throw new ForbiddenException("エラー");
+
+        const user = await this.userRepository.findOne({
+            where: {
+                id: Equal(user_id)
+            }
+        })
+
+        console.log(data)
+
+        if(!user) throw new NotFoundException();
+
+        await this.userRepository.update({id: user_id},data)
+
+        return this.userRepository.findOne({
+            where: {
+                id: Equal(user_id)
+            }
+        })
     }
 }

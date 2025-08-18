@@ -6,7 +6,7 @@ import listEndpoints from 'express-list-endpoints';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const port = process.env.PORT || 3001;
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(new ValidationPipe({transform: true}));
   app.enableCors({
     origin: "*",
     allowedHeaders: 'Origin, X-Requested-With, Content-Type, Accept'

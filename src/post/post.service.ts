@@ -90,7 +90,6 @@ export class PostService {
                 created_at: "DESC"
             }
         })
-
         return res
     }
 

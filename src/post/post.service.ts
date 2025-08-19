@@ -53,19 +53,21 @@ export class PostService {
         const qb = this.microPostsRepository
         .createQueryBuilder("micro_post")
         .leftJoinAndSelect("user", "user", "user.id = micro_post.user_id" )
+        .leftJoin("user.profile", "profile")
         .select([
             "micro_post.id as id",
             "micro_post.user_id as user_id",
             "user.name as name",
             "micro_post.content as content",
+            "profile.description as description",
+            "profile.img as img",
             "micro_post.created_at as created_at"
         ])
         .orderBy("micro_post.created_at","DESC")
         .offset(start)
         .limit(nr_records);
-
-        const records = await qb.getRawMany<ResultType>();
-        
+   
+        const records = await qb.getRawMany<ResultType>();      
 
         return records     
     }
@@ -80,16 +82,25 @@ export class PostService {
         })
 
         if(!auth) throw new ForbiddenException();
+        const qb = this.microPostsRepository
+        .createQueryBuilder("micro_post")
+        .leftJoinAndSelect("user", "user", "user.id = micro_post.user_id" )
+        .leftJoin("user.profile", "profile")
+        .select([
+            "micro_post.id as id",
+            "micro_post.user_id as user_id",
+            "user.name as name",
+            "micro_post.content as content",
+            "profile.description as description",
+            "profile.img as img",
+            "micro_post.created_at as created_at"
+        ])
+        .where(
+            "user_id = :id", {id: id}
+        )
+        .orderBy("micro_post.created_at","DESC")
 
-        const res = await this.microPostsRepository.find({
-            where: {
-                user_id: Equal(id)
-            },
-
-            order: {
-                created_at: "DESC"
-            }
-        })
+        const res = await qb.getRawMany<ResultType>();
         return res
     }
 
@@ -107,11 +118,14 @@ export class PostService {
         const qb = this.microPostsRepository
             .createQueryBuilder("micro_post")
             .leftJoinAndSelect("user", "user", "user.id = micro_post.user_id" )
+            .leftJoin("user.profile", "profile")
             .select([
                 "micro_post.id as id",
                 "micro_post.user_id as user_id",
                 "user.name as name",
                 "micro_post.content as content",
+                "profile.img as img",
+                "profile.description as description",
                 "micro_post.created_at as created_at"
             ])
             .where(

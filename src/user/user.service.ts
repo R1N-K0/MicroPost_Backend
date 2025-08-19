@@ -60,7 +60,6 @@ export class UserService {
             email: email,
             hash: hash
         }
-
         return await this.userRepository.save(record)
     }
 
@@ -82,8 +81,6 @@ export class UserService {
                 id: Equal(user_id)
             }
         })
-
-        console.log(data)
 
         if(!user) throw new NotFoundException();
 

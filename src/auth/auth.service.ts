@@ -1,10 +1,11 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Equal, Repository } from 'typeorm';
+import { Equal, MoreThan, Repository } from 'typeorm';
 import { User } from 'src/entities/user.entity';
 import { Auth } from 'src/entities/auth.entity';
 import * as crypto from "crypto"
 import { AuthUserDto } from 'src/Dto/auth-user-dto';
+import { CheckUserDto } from 'src/Dto/check-user-dto';
 
 @Injectable()
 export class AuthService {
@@ -61,5 +62,23 @@ export class AuthService {
         }
 
         return ret
+    }
+
+    async checkUser(checkUserDto: CheckUserDto) {
+        const {user_id, token} = checkUserDto
+        const now = new Date();
+
+        const auth = await this.authRepository.findOne({
+            where: {
+                token: Equal(token),
+                expire_at: MoreThan(now)
+            }
+        })
+        if(!auth) throw new ForbiddenException();
+
+        if(auth.user_id !== user_id) throw new ForbiddenException();
+
+               
+        
     }
 }

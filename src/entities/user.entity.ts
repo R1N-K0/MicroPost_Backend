@@ -3,8 +3,10 @@ import {
         Column,
         PrimaryGeneratedColumn,
         CreateDateColumn,
-        UpdateDateColumn
+        UpdateDateColumn,
+        OneToOne
 } from 'typeorm'
+import { Profile } from './profile';
 
 @Entity()
 export class User {
@@ -19,6 +21,9 @@ export class User {
 
     @Column("varchar")
     email: string;
+
+    @OneToOne(() => Profile, (profile) => profile.user, {eager: true})
+    profile: Profile
 
     @CreateDateColumn()
     readonly created_at?: Date;

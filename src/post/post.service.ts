@@ -66,7 +66,7 @@ export class PostService {
 
         const records = await qb.getRawMany<ResultType>();
         
-        console.log(records)
+
         return records     
     }
 
@@ -122,8 +122,6 @@ export class PostService {
             .limit(nr_records);
         
         const records = await qb.getRawMany<ResultType>();
-
-        console.log(records)
         return records     
 
     }

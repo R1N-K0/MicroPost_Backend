@@ -34,7 +34,11 @@ export class UserService {
             select: {
                 id: true,
                 name: true,
+                email: true,
                 created_at: true
+            },
+            relations: {
+                profile: true
             }
         })
 
